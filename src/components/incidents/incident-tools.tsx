@@ -1,6 +1,8 @@
+
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
+import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,11 +40,11 @@ export function IncidentTools() {
   const { toast } = useToast();
 
   const analyzeInitialState: AnalyzeBehaviorActionState = {};
-  const [analyzeState, analyzeFormAction] = useFormState(analyzeBehaviorAction, analyzeInitialState);
+  const [analyzeState, analyzeFormAction] = useActionState(analyzeBehaviorAction, analyzeInitialState);
   const analyzeFormRef = useRef<HTMLFormElement>(null);
 
   const summarizeInitialState: SummarizeReportActionState = {};
-  const [summarizeState, summarizeFormAction] = useFormState(summarizeReportAction, summarizeInitialState);
+  const [summarizeState, summarizeFormAction] = useActionState(summarizeReportAction, summarizeInitialState);
   const summarizeFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {

@@ -1,6 +1,8 @@
+
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
+import { useActionState } from "react";
 import { generatePolicyAction, type GeneratePolicyActionState } from "@/app/actions/generate-policy-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +26,7 @@ function SubmitButton() {
 
 export function GeneratePolicyForm() {
   const initialState: GeneratePolicyActionState = {};
-  const [state, formAction] = useFormState(generatePolicyAction, initialState);
+  const [state, formAction] = useActionState(generatePolicyAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 

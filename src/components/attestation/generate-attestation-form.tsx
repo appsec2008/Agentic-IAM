@@ -1,6 +1,8 @@
+
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
+import { useActionState } from "react";
 import { generateAttestationAction, type GenerateAttestationActionState } from "@/app/actions/generate-attestation-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,7 +33,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
   const initialState: GenerateAttestationActionState = {
     fields: initialAgentId ? { agentId: initialAgentId } : {},
   };
-  const [state, formAction] = useFormState(generateAttestationAction, initialState);
+  const [state, formAction] = useActionState(generateAttestationAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
