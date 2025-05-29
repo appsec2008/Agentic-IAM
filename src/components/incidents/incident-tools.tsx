@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useFormStatus } from "react-dom";
-import { useActionState } from "react";
+import { useFormStatus, useActionState } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrainCircuit, FileText, CheckCircle, AlertCircle, BarChartBig } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 import { analyzeBehaviorAction, type AnalyzeBehaviorActionState } from "@/app/actions/analyze-behavior-action";
@@ -39,9 +38,21 @@ function SummarizeReportSubmitButton() {
 export function IncidentTools() {
   const { toast } = useToast();
 
-  const analyzeInitialState: AnalyzeBehaviorActionState = {};
+  const analyzeInitialState: AnalyzeBehaviorActionState = { fields: { threshold: 0.8 } }; // Set default threshold here
   const [analyzeState, analyzeFormAction] = useActionState(analyzeBehaviorAction, analyzeInitialState);
   const analyzeFormRef = useRef<HTMLFormElement>(null);
+  
+  const [selectedAgentForAnalysis, setSelectedAgentForAnalysis] = useState<string>(
+    analyzeInitialState?.fields?.agentId as string || ""
+  );
+
+  useEffect(() => {
+    const agentIdFromState = analyzeState?.fields?.agentId as string | undefined;
+    if (agentIdFromState && agentIdFromState !== selectedAgentForAnalysis) {
+      setSelectedAgentForAnalysis(agentIdFromState);
+    }
+  }, [analyzeState?.fields?.agentId, selectedAgentForAnalysis]);
+
 
   const summarizeInitialState: SummarizeReportActionState = {};
   const [summarizeState, summarizeFormAction] = useActionState(summarizeReportAction, summarizeInitialState);
@@ -50,7 +61,10 @@ export function IncidentTools() {
   useEffect(() => {
     if (analyzeState?.message) {
       toast({ title: "Success", description: analyzeState.message, action: <CheckCircle className="text-green-500" /> });
-      if (analyzeState.analysisResult) analyzeFormRef.current?.reset();
+      if (analyzeState.analysisResult) {
+        analyzeFormRef.current?.reset();
+        setSelectedAgentForAnalysis(""); // Reset select
+      }
     }
     if (analyzeState?.error) {
       toast({ title: "Error Analyzing Behavior", description: analyzeState.error, variant: "destructive", action: <AlertCircle className="text-red-500" /> });
@@ -78,9 +92,12 @@ export function IncidentTools() {
         <form action={analyzeFormAction} ref={analyzeFormRef}>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="agentId" className="text-muted-foreground">Agent ID</Label>
-               <Select name="agentId" defaultValue={analyzeState?.fields?.agentId as string | undefined}>
-                <SelectTrigger id="agentId" className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground">
+              <Label htmlFor="agentIdAnalyzeSelect" className="text-muted-foreground">Agent ID</Label>
+               <Select
+                  value={selectedAgentForAnalysis}
+                  onValueChange={setSelectedAgentForAnalysis}
+                >
+                <SelectTrigger id="agentIdAnalyzeSelect" className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground">
                   <SelectValue placeholder="Select an agent DID" />
                 </SelectTrigger>
                 <SelectContent>
@@ -89,17 +106,18 @@ export function IncidentTools() {
                   ))}
                 </SelectContent>
               </Select>
-              {analyzeState?.issues?.find(issue => issue.includes("Agent ID")) && <p className="text-sm text-red-400 mt-1">{analyzeState.issues.find(issue => issue.includes("Agent ID"))}</p>}
+              <input type="hidden" name="agentId" value={selectedAgentForAnalysis} />
+              {analyzeState?.issues?.find(issue => issue.toLowerCase().includes("agent id")) && <p className="text-sm text-red-400 mt-1">{analyzeState.issues.find(issue => issue.toLowerCase().includes("agent id"))}</p>}
             </div>
             <div>
               <Label htmlFor="logs" className="text-muted-foreground">Behavior Logs</Label>
               <Textarea id="logs" name="logs" placeholder="Paste agent logs here..." rows={5} defaultValue={analyzeState?.fields?.logs as string | undefined} className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground"/>
-              {analyzeState?.issues?.find(issue => issue.includes("Logs")) && <p className="text-sm text-red-400 mt-1">{analyzeState.issues.find(issue => issue.includes("Logs"))}</p>}
+              {analyzeState?.issues?.find(issue => issue.toLowerCase().includes("logs")) && <p className="text-sm text-red-400 mt-1">{analyzeState.issues.find(issue => issue.toLowerCase().includes("logs"))}</p>}
             </div>
             <div>
               <Label htmlFor="threshold" className="text-muted-foreground">Anomaly Threshold (0.0 - 1.0)</Label>
               <Input id="threshold" name="threshold" type="number" step="0.01" min="0" max="1" placeholder="e.g., 0.8" defaultValue={analyzeState?.fields?.threshold ?? 0.8} className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground"/>
-              {analyzeState?.issues?.find(issue => issue.includes("Threshold")) && <p className="text-sm text-red-400 mt-1">{analyzeState.issues.find(issue => issue.includes("Threshold"))}</p>}
+              {analyzeState?.issues?.find(issue => issue.toLowerCase().includes("threshold")) && <p className="text-sm text-red-400 mt-1">{analyzeState.issues.find(issue => issue.toLowerCase().includes("threshold"))}</p>}
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">

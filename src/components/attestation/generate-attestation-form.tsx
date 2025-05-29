@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useFormStatus } from "react-dom";
-import { useActionState } from "react";
+import { useFormStatus, useActionState } from "react-dom";
 import { generateAttestationAction, type GenerateAttestationActionState } from "@/app/actions/generate-attestation-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileCheck2, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MOCK_AGENTS } from "@/lib/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,6 +36,20 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
+  const [selectedAgentId, setSelectedAgentId] = useState<string>(
+    initialState?.fields?.agentId || initialAgentId || ""
+  );
+
+  useEffect(() => {
+    const agentIdFromState = state?.fields?.agentId as string | undefined;
+    if (agentIdFromState && agentIdFromState !== selectedAgentId) {
+      setSelectedAgentId(agentIdFromState);
+    } else if (!agentIdFromState && initialAgentId && initialAgentId !== selectedAgentId) {
+      setSelectedAgentId(initialAgentId);
+    }
+  }, [state?.fields?.agentId, initialAgentId, selectedAgentId]);
+
+
  useEffect(() => {
     if (state?.message) {
       toast({
@@ -44,7 +57,10 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
         description: state.message,
         action: <CheckCircle className="text-green-500" />,
       });
-      if(state.report) formRef.current?.reset();
+      if(state.report) {
+        formRef.current?.reset();
+        setSelectedAgentId(initialAgentId || ""); // Reset select if initialAgentId is present
+      }
     }
     if (state?.error) {
       toast({
@@ -54,7 +70,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
         action: <AlertCircle className="text-red-500" />,
       });
     }
-  }, [state, toast]);
+  }, [state, toast, initialAgentId]);
 
 
   return (
@@ -71,9 +87,12 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
       <form action={formAction} ref={formRef}>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="agentId" className="text-muted-foreground">Agent ID (DID)</Label>
-            <Select name="agentId" defaultValue={state?.fields?.agentId || initialAgentId}>
-              <SelectTrigger id="agentId" className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground">
+            <Label htmlFor="agentIdSelect" className="text-muted-foreground">Agent ID (DID)</Label>
+            <Select
+              value={selectedAgentId}
+              onValueChange={setSelectedAgentId}
+            >
+              <SelectTrigger id="agentIdSelect" className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground">
                 <SelectValue placeholder="Select an agent DID" />
               </SelectTrigger>
               <SelectContent>
@@ -82,7 +101,8 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
                 ))}
               </SelectContent>
             </Select>
-            {state?.issues?.find(issue => issue.includes("Agent ID")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.includes("Agent ID"))}</p>}
+            <input type="hidden" name="agentId" value={selectedAgentId} />
+            {state?.issues?.find(issue => issue.toLowerCase().includes("agent id")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.toLowerCase().includes("agent id"))}</p>}
           </div>
           <div>
             <Label htmlFor="complianceRequirements" className="text-muted-foreground">Compliance Requirements</Label>
@@ -94,7 +114,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
               defaultValue={state?.fields?.complianceRequirements}
               className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground"
             />
-            {state?.issues?.find(issue => issue.includes("Compliance requirements")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.includes("Compliance requirements"))}</p>}
+            {state?.issues?.find(issue => issue.toLowerCase().includes("compliance requirements")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.toLowerCase().includes("compliance requirements"))}</p>}
           </div>
            <div>
             <Label htmlFor="reportFormatInstructions" className="text-muted-foreground">Report Format Instructions (Optional)</Label>
