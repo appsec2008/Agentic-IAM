@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { MOCK_AGENTS, MOCK_INCIDENTS, MOCK_POLICIES, APP_NAME } from "@/lib/constants";
-import { Users2, AlertTriangle, FileShield, CheckCircle2, Activity, ShieldAlert } from "lucide-react";
+import { Users2, AlertTriangle, FileSliders, CheckCircle2, Activity, ShieldAlert, LayoutDashboard, GitBranch } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Agents" value={MOCK_AGENTS.length} icon={Users2} description="Managed AI agents" />
         <StatCard title="Active Incidents" value={activeIncidents} icon={AlertTriangle} description="Requiring attention" />
-        <StatCard title="Access Policies" value={MOCK_POLICIES.length} icon={FileShield} description="Configured policies" />
+        <StatCard title="Access Policies" value={MOCK_POLICIES.length} icon={FileSliders} description="Configured policies" />
         <StatCard title="Avg. Trust Score" value={`${averageTrustScore}%`} icon={CheckCircle2} description="System-wide agent trust" />
       </div>
 

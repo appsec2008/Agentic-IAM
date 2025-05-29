@@ -1,5 +1,5 @@
 import type { Agent, Policy, Incident, AuditLog, NavItem, VerifiableCredential } from './types';
-import { LayoutDashboard, Users2, SearchCode, FileShield, AlertTriangle, ScrollText, FileCheck2, GitBranch } from 'lucide-react';
+import { LayoutDashboard, Users2, SearchCode, FileSliders, AlertTriangle, ScrollText, FileCheck2, GitBranch } from 'lucide-react';
 
 export const APP_NAME = "Agentic IAM Fortress";
 
@@ -7,7 +7,7 @@ export const NAV_ITEMS: NavItem[] = [
   { title: 'Dashboard', href: '/', icon: LayoutDashboard },
   { title: 'Agents', href: '/agents', icon: Users2 },
   { title: 'Agent Discovery', href: '/discovery', icon: SearchCode },
-  { title: 'Access Policies', href: '/policies', icon: FileShield },
+  { title: 'Access Policies', href: '/policies', icon: FileSliders },
   { title: 'Incidents', href: '/incidents', icon: AlertTriangle },
   { title: 'Attestation', href: '/attestation', icon: FileCheck2 },
   { title: 'Audit Logs', href: '/audits', icon: ScrollText },
