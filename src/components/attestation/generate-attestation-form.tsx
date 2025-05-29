@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useFormStatus, useActionState } from "react-dom";
+import { useFormStatus } from "react-dom";
+import { useActionState } from "react";
 import { generateAttestationAction, type GenerateAttestationActionState } from "@/app/actions/generate-attestation-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
