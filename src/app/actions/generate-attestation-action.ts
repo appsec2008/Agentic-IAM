@@ -5,8 +5,8 @@ import { generateAttestationReport, type GenerateAttestationReportInput } from "
 import { z } from "zod";
 
 const InputSchema = z.object({
-  agentId: z.string().optional(), // Made optional
-  complianceRequirements: z.string().optional(), // Made optional
+  agentId: z.string().optional(), 
+  complianceRequirements: z.string().optional(), 
   reportFormatInstructions: z.string().optional(),
 });
 
@@ -26,10 +26,12 @@ export async function generateAttestationAction(
   prevState: GenerateAttestationActionState,
   formData: FormData
 ): Promise<GenerateAttestationActionState> {
+  const agentIdValue = formData.get("agentId");
+  
   const rawInput = {
-    agentId: formData.get("agentId") || undefined, // Ensure undefined if empty for Zod optional
-    complianceRequirements: formData.get("complianceRequirements") || undefined, // Ensure undefined if empty
-    reportFormatInstructions: formData.get("reportFormatInstructions") || undefined, // Ensure undefined if empty
+    agentId: agentIdValue === "--NONE--" || agentIdValue === "" ? undefined : (agentIdValue as string | undefined),
+    complianceRequirements: formData.get("complianceRequirements") || undefined, 
+    reportFormatInstructions: formData.get("reportFormatInstructions") || undefined, 
   };
 
   const validatedFields = InputSchema.safeParse(rawInput);
@@ -37,7 +39,7 @@ export async function generateAttestationAction(
   if (!validatedFields.success) {
     return {
       error: "Invalid input. Please check the fields.",
-      fields: rawInput as GenerateAttestationActionState['fields'],
+      fields: rawInput as GenerateAttestationActionState['fields'], // Cast, as agentId could be "--NONE--"
       issues: validatedFields.error.issues.map((issue) => issue.message),
     };
   }

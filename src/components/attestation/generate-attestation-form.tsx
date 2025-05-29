@@ -30,24 +30,24 @@ interface GenerateAttestationFormProps {
 
 export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationFormProps) {
   const initialState: GenerateAttestationActionState = {
-    fields: initialAgentId ? { agentId: initialAgentId } : { agentId: "" }, // Ensure agentId field exists
+    fields: initialAgentId ? { agentId: initialAgentId } : { agentId: "" }, // agentId: "" will show placeholder
   };
   const [state, formAction] = useActionState(generateAttestationAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
+  // selectedAgentId can be "", an actual agent ID, or "--NONE--"
   const [selectedAgentId, setSelectedAgentId] = useState<string>(
     initialState?.fields?.agentId || initialAgentId || ""
   );
 
   useEffect(() => {
     const agentIdFromState = state?.fields?.agentId as string | undefined;
-    if (agentIdFromState && agentIdFromState !== selectedAgentId) {
+    if (agentIdFromState !== undefined && agentIdFromState !== selectedAgentId) {
       setSelectedAgentId(agentIdFromState);
-    } else if (initialAgentId && initialAgentId !== selectedAgentId && !agentIdFromState) {
-      // If state is cleared (e.g. successful submission) but initialAgentId exists, re-select it or clear.
-      // For now, let's clear to allow fresh optional selection.
-      // If form resets, initial state might repopulate, or we clear selectedAgentId
+    } else if (initialAgentId && initialAgentId !== selectedAgentId && agentIdFromState === undefined) {
+      // If state is cleared (e.g. successful submission) but initialAgentId exists, re-select it.
+      // If form resets, initial state might repopulate, or we clear selectedAgentId.
       setSelectedAgentId(state?.report ? (initialAgentId || "") : (agentIdFromState || ""));
     }
   }, [state?.fields?.agentId, initialAgentId, selectedAgentId, state?.report]);
@@ -92,20 +92,22 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
           <div>
             <Label htmlFor="agentIdSelect" className="text-muted-foreground">Agent ID (DID) (Optional)</Label>
             <Select
-              value={selectedAgentId}
+              value={selectedAgentId} // Controlled component
               onValueChange={setSelectedAgentId}
-              name="agentId" // Ensure name attribute is here for form submission
+              // name="agentId" // Name is on hidden input
             >
               <SelectTrigger id="agentIdSelect" className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground">
                 <SelectValue placeholder="Select an agent DID (Optional)" />
               </SelectTrigger>
               <SelectContent>
-                 <SelectItem value="">-- None --</SelectItem> 
+                 <SelectItem value="--NONE--">-- None --</SelectItem> 
                 {MOCK_AGENTS.map(agent => (
                   <SelectItem key={agent.id} value={agent.id}>{agent.name} ({agent.id.substring(0,20)}...)</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {/* Hidden input to carry the value to FormData */}
+            <input type="hidden" name="agentId" value={selectedAgentId} />
             {state?.issues?.find(issue => issue.toLowerCase().includes("agent id")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.toLowerCase().includes("agent id"))}</p>}
           </div>
           <div>
