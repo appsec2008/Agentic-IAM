@@ -3,46 +3,61 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
+    --background: 233 64% 30%; /* Dark Navy Blue */
+    --foreground: 0 0% 98%; /* Light color for text */
+
+    --card: 233 60% 35%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 233 60% 35%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 291 64% 42%; /* Vivid Purple */
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+
+    --secondary: 233 50% 40%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 233 40% 50%;
+    --muted-foreground: 233 10% 75%;
+
+    --accent: 262 52% 47%; /* Electric Indigo */
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%; /* Kept dark theme destructive for now, can adjust */
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    --border: 233 50% 45%;
+    --input: 233 50% 45%;
+    --ring: 262 52% 57%; /* Lighter accent for rings */
+
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+
+    /* Chart colors - can be adjusted to fit the new theme */
+    --chart-1: 291 64% 52%; /* Based on primary */
+    --chart-2: 262 52% 57%; /* Based on accent */
+    --chart-3: 233 64% 50%; /* Based on background, lighter */
+    --chart-4: 291 50% 60%;
+    --chart-5: 262 40% 65%;
+
+    /* Sidebar specific variables */
+    --sidebar-background: 233 60% 25%; /* Slightly darker than main bg or contrasting */
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 291 64% 52%; /* Vivid Purple for active/selected */
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 262 52% 50%; /* Electric Indigo for hover */
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 233 50% 40%;
+    --sidebar-ring: 262 52% 57%;
   }
+
   .dark {
+    /* Keeping dark theme variables as they are, this app primarily uses the new base theme */
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
@@ -67,6 +82,8 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* Dark Sidebar variables */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
