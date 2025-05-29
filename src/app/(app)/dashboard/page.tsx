@@ -76,7 +76,7 @@ export default function DashboardPage() {
               <span className="text-muted-foreground">Audit Logging</span>
               <span className="font-semibold text-green-400">Operational</span>
             </div>
-            <Image src="https://placehold.co/600x400.png" alt="System health chart placeholder" width={600} height={400} className="rounded-md mt-4" data-ai-hint="network graph"/>
+            {/* Removed placeholder image */}
           </CardContent>
         </Card>
       </div>
