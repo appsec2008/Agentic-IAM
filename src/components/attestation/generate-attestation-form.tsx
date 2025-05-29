@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useFormStatus } from "react-dom";
-import { useActionState } from "react";
+import { useFormStatus, useActionState } from "react-dom";
 import { generateAttestationAction, type GenerateAttestationActionState } from "@/app/actions/generate-attestation-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,7 +30,7 @@ interface GenerateAttestationFormProps {
 
 export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationFormProps) {
   const initialState: GenerateAttestationActionState = {
-    fields: initialAgentId ? { agentId: initialAgentId } : {},
+    fields: initialAgentId ? { agentId: initialAgentId } : { agentId: "" }, // Ensure agentId field exists
   };
   const [state, formAction] = useActionState(generateAttestationAction, initialState);
   const { toast } = useToast();
@@ -45,10 +44,13 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
     const agentIdFromState = state?.fields?.agentId as string | undefined;
     if (agentIdFromState && agentIdFromState !== selectedAgentId) {
       setSelectedAgentId(agentIdFromState);
-    } else if (!agentIdFromState && initialAgentId && initialAgentId !== selectedAgentId) {
-      setSelectedAgentId(initialAgentId);
+    } else if (initialAgentId && initialAgentId !== selectedAgentId && !agentIdFromState) {
+      // If state is cleared (e.g. successful submission) but initialAgentId exists, re-select it or clear.
+      // For now, let's clear to allow fresh optional selection.
+      // If form resets, initial state might repopulate, or we clear selectedAgentId
+      setSelectedAgentId(state?.report ? (initialAgentId || "") : (agentIdFromState || ""));
     }
-  }, [state?.fields?.agentId, initialAgentId, selectedAgentId]);
+  }, [state?.fields?.agentId, initialAgentId, selectedAgentId, state?.report]);
 
 
  useEffect(() => {
@@ -60,7 +62,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
       });
       if(state.report) {
         formRef.current?.reset();
-        setSelectedAgentId(initialAgentId || ""); // Reset select if initialAgentId is present
+        setSelectedAgentId(initialAgentId || ""); 
       }
     }
     if (state?.error) {
@@ -82,35 +84,38 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
            AI-Powered Attestation Report
         </CardTitle>
         <CardDescription>
-          Generate a compliance attestation report for an AI agent based on its verifiable credentials and policy enforcement.
+          Generate a compliance attestation report for an AI agent. All fields are optional; defaults will be used if left empty.
         </CardDescription>
       </CardHeader>
       <form action={formAction} ref={formRef}>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="agentIdSelect" className="text-muted-foreground">Agent ID (DID)</Label>
+            <Label htmlFor="agentIdSelect" className="text-muted-foreground">Agent ID (DID) (Optional)</Label>
             <Select
               value={selectedAgentId}
               onValueChange={setSelectedAgentId}
+              name="agentId" // Ensure name attribute is here for form submission if not using hidden input
             >
               <SelectTrigger id="agentIdSelect" className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground">
-                <SelectValue placeholder="Select an agent DID" />
+                <SelectValue placeholder="Select an agent DID (Optional)" />
               </SelectTrigger>
               <SelectContent>
+                 <SelectItem value="">-- None --</SelectItem> 
                 {MOCK_AGENTS.map(agent => (
                   <SelectItem key={agent.id} value={agent.id}>{agent.name} ({agent.id.substring(0,20)}...)</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <input type="hidden" name="agentId" value={selectedAgentId} />
+            {/* Hidden input is still useful if Select doesn't reliably pass name via FormData on its own */}
+            {/* <input type="hidden" name="agentId" value={selectedAgentId} /> */}
             {state?.issues?.find(issue => issue.toLowerCase().includes("agent id")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.toLowerCase().includes("agent id"))}</p>}
           </div>
           <div>
-            <Label htmlFor="complianceRequirements" className="text-muted-foreground">Compliance Requirements</Label>
+            <Label htmlFor="complianceRequirements" className="text-muted-foreground">Compliance Requirements (Optional)</Label>
             <Textarea 
               id="complianceRequirements" 
               name="complianceRequirements" 
-              placeholder="Describe the compliance requirements to be attested (e.g., GDPR Article 5, ISO 27001 Annex A.12)" 
+              placeholder="Describe compliance requirements (e.g., GDPR Article 5). If empty, general standards will be used." 
               rows={3}
               defaultValue={state?.fields?.complianceRequirements}
               className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground"
@@ -122,7 +127,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
             <Textarea 
               id="reportFormatInstructions" 
               name="reportFormatInstructions" 
-              placeholder="Specific formatting or content instructions for the report. If not provided, a default format will be used." 
+              placeholder="Specific formatting instructions. If empty, a default professional format will be used." 
               rows={3}
               defaultValue={state?.fields?.reportFormatInstructions}
               className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground"

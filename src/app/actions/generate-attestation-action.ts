@@ -1,11 +1,12 @@
+
 "use server";
 
-import { generateAttestationReport, type GenerateAttestationReportInput, type GenerateAttestationReportOutput } from "@/ai/flows/generate-attestation-report";
+import { generateAttestationReport, type GenerateAttestationReportInput } from "@/ai/flows/generate-attestation-report";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  agentId: z.string().min(1, "Agent ID is required."),
-  complianceRequirements: z.string().min(1, "Compliance requirements are required."),
+  agentId: z.string().optional(), // Made optional
+  complianceRequirements: z.string().optional(), // Made optional
   reportFormatInstructions: z.string().optional(),
 });
 
@@ -13,7 +14,11 @@ export interface GenerateAttestationActionState {
   message?: string;
   error?: string;
   report?: string;
-  fields?: Record<string, string>;
+  fields?: {
+    agentId?: string;
+    complianceRequirements?: string;
+    reportFormatInstructions?: string;
+  };
   issues?: string[];
 }
 
@@ -22,9 +27,9 @@ export async function generateAttestationAction(
   formData: FormData
 ): Promise<GenerateAttestationActionState> {
   const rawInput = {
-    agentId: formData.get("agentId"),
-    complianceRequirements: formData.get("complianceRequirements"),
-    reportFormatInstructions: formData.get("reportFormatInstructions"),
+    agentId: formData.get("agentId") || undefined, // Ensure undefined if empty for Zod optional
+    complianceRequirements: formData.get("complianceRequirements") || undefined, // Ensure undefined if empty
+    reportFormatInstructions: formData.get("reportFormatInstructions") || undefined, // Ensure undefined if empty
   };
 
   const validatedFields = InputSchema.safeParse(rawInput);
@@ -32,17 +37,19 @@ export async function generateAttestationAction(
   if (!validatedFields.success) {
     return {
       error: "Invalid input. Please check the fields.",
-      fields: rawInput as Record<string, string>,
+      fields: rawInput as GenerateAttestationActionState['fields'],
       issues: validatedFields.error.issues.map((issue) => issue.message),
     };
   }
 
   try {
+    // Prepare input for the flow, ensuring optional fields are passed correctly
     const input: GenerateAttestationReportInput = {
-        agentId: validatedFields.data.agentId,
-        complianceRequirements: validatedFields.data.complianceRequirements,
-        ...(validatedFields.data.reportFormatInstructions && { reportFormatInstructions: validatedFields.data.reportFormatInstructions }),
+      ...(validatedFields.data.agentId && { agentId: validatedFields.data.agentId }),
+      ...(validatedFields.data.complianceRequirements && { complianceRequirements: validatedFields.data.complianceRequirements }),
+      ...(validatedFields.data.reportFormatInstructions && { reportFormatInstructions: validatedFields.data.reportFormatInstructions }),
     };
+    
     const result = await generateAttestationReport(input);
     
     if (result.report) {
