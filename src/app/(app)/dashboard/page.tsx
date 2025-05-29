@@ -76,7 +76,6 @@ export default function DashboardPage() {
               <span className="text-muted-foreground">Audit Logging</span>
               <span className="font-semibold text-green-400">Operational</span>
             </div>
-            {/* Removed placeholder image */}
           </CardContent>
         </Card>
       </div>
@@ -86,15 +85,30 @@ export default function DashboardPage() {
               <GitBranch className="h-6 w-6 text-primary" />
               Framework Overview
             </CardTitle>
-            <CardDescription>Learn more about the Agentic AI IAM framework.</CardDescription>
+            <CardDescription>
+              A Novel Zero-Trust Identity Framework for Agentic AI: Decentralized Authentication and Fine-Grained Access Control
+              <br />
+              <span className="text-xs text-muted-foreground">
+                Ken Huang, Vineeth Sai Narajala, John Yeoh, Ramesh Raskar, Youssef Harkati, Jerry Huang, Idan Habler, Chris Hughes
+              </span>
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">
-              This application demonstrates key concepts from the "Agentic AI Identity and Access Management: A New Approach" paper. Explore different sections to see how Decentralized Identifiers (DIDs), Verifiable Credentials (VCs), and an Agent Naming Service (ANS) can enable robust, fine-grained access control and enhance security for Multi-Agent Systems.
+            <p className="text-muted-foreground mb-3 text-sm">
+              Traditional Identity and Access Management (IAM) systems, primarily designed for human users or static machine identities via protocols such as OAuth, OpenID Connect (OIDC), and SAML, prove fundamentally inadequate for the dynamic, interdependent, and often ephemeral nature of AI agents operating at scale within Multi Agent Systems (MAS), a computational system composed of multiple interacting intelligent agents that work collectively.
+            </p>
+            <p className="text-muted-foreground mb-3 text-sm">
+              This paper posits the imperative for a novel Agentic AI IAM framework: We deconstruct the limitations of existing protocols when applied to MAS, illustrating with concrete examples why their coarse-grained controls, single-entity focus, and lack of context-awareness falter. We then propose a comprehensive framework built upon rich, verifiable Agent Identities (IDs), leveraging Decentralized Identifiers (DIDs) and Verifiable Credentials (VCs), that encapsulate an agents capabilities, provenance, behavioral scope, and security posture.
+            </p>
+            <p className="text-muted-foreground mb-3 text-sm">
+              Our framework includes an Agent Naming Service (ANS) for secure and capability-aware discovery, dynamic fine-grained access control mechanisms, and critically, a unified global session management and policy enforcement layer for real-time control and consistent revocation across heterogeneous agent communication protocols. We also explore how Zero-Knowledge Proofs (ZKPs) enable privacy-preserving attribute disclosure and verifiable policy compliance.
+            </p>
+            <p className="text-muted-foreground mb-4 text-sm">
+              We outline the architecture, operational lifecycle, innovative contributions, and security considerations of this new IAM paradigm, aiming to establish the foundational trust, accountability, and security necessary for the burgeoning field of agentic AI and the complex ecosystems they will inhabit.
             </p>
             <div className="flex gap-4">
               <Button asChild variant="outline">
-                <Link href="https://cloudsecurityalliance.org/blog/2025/03/11/agentic-ai-identity-management-approach/" target="_blank">Read CSA Paper (Placeholder)</Link>
+                <Link href="https://arxiv.org/abs/2505.19301" target="_blank">Read ArXiv Paper</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/agents">Explore Agents</Link>
