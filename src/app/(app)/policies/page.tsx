@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MOCK_POLICIES } from "@/lib/constants";
-import { FileShield, ListChecks } from "lucide-react";
+import { FileSliders, ListChecks } from "lucide-react";
 import { GeneratePolicyForm } from "@/components/policies/generate-policy-form";
 import {
   Accordion,
@@ -16,7 +16,7 @@ export default function PoliciesPage() {
       <PageHeader 
         title="Access Policies"
         description="Manage and generate attribute-based access control (ABAC) policies for AI agents."
-        icon={FileShield}
+        icon={FileSliders}
       />
 
       <GeneratePolicyForm />
