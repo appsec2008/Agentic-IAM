@@ -1,5 +1,5 @@
 import type { Agent, Policy, Incident, AuditLog, NavItem, VerifiableCredential } from './types';
-import { LayoutDashboard, Users2, SearchCode, FileSliders, AlertTriangle, ScrollText, FileCheck2, GitBranch } from 'lucide-react';
+import { LayoutDashboard, Users2, SearchCode, FileSliders, AlertTriangle, ScrollText, FileCheck2 } from 'lucide-react';
 
 export const APP_NAME = "Agentic IAM Fortress";
 
@@ -63,8 +63,6 @@ export const MOCK_AGENTS: Agent[] = [
     capabilities: ['FinancialRiskAnalysis', 'CorporateReporting', 'SalesDataAnalyticsCapability'],
     roles: ['FinancialRiskAnalystRole'],
     vcs: sampleVCs,
-    avatar: 'https://placehold.co/128x128.png',
-    dataAiHint: 'robot face',
     description: 'Performs financial risk analysis based on sales and market data for corporate reporting.',
     creator: 'did:example:user:alice-dev',
     modelInfo: 'Proprietary Financial Model v3.2',
@@ -85,8 +83,6 @@ export const MOCK_AGENTS: Agent[] = [
     capabilities: ['CustomerSupport', 'ProductKnowledgeLookup', 'TicketManagement'],
     roles: ['CustomerSupportTier1'],
     vcs: [sampleVCs[0]],
-    avatar: 'https://placehold.co/128x128.png',
-    dataAiHint: 'support headset',
     description: 'Handles customer support queries for Product X, accessing knowledge base and ticket systems.',
     creator: 'did:example:user:bob-manager',
     modelInfo: 'FAQ Retrieval LLM v1.5',
@@ -100,8 +96,6 @@ export const MOCK_AGENTS: Agent[] = [
     capabilities: ['InventoryLookup', 'StockUpdateReporting'],
     roles: ['StoreOperationsAssistant'],
     vcs: [],
-    avatar: 'https://placehold.co/128x128.png',
-    dataAiHint: 'barcode scanner',
     description: 'Hourly checks inventory levels for Retail Store XYZ and reports to InventoryMasterAgent. Currently quarantined due to anomalous activity.',
     creator: 'did:example:system:ops-automation',
     modelInfo: 'Simple Logic Bot v2.0',
@@ -115,8 +109,6 @@ export const MOCK_AGENTS: Agent[] = [
     capabilities: ['DataExtraction', 'DataTransformation', 'DataLoading'],
     roles: ['ETLOperator'],
     vcs: [sampleVCs[1]],
-    avatar: 'https://placehold.co/128x128.png',
-    dataAiHint: 'data flow',
     description: 'Nightly ETL agent responsible for loading data into the data warehouse. Currently inactive during maintenance window.',
     creator: 'did:example:user:charlie-dataeng',
     modelInfo: 'Apache NiFi Flow Agent v1.3',
