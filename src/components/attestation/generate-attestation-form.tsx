@@ -14,6 +14,8 @@ import { FileCheck2, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MOCK_AGENTS } from "@/lib/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -38,16 +40,18 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
 
   // selectedAgentId can be "", an actual agent ID, or "--NONE--"
   const [selectedAgentId, setSelectedAgentId] = useState<string>(
-    initialState?.fields?.agentId || initialAgentId || ""
+     initialState?.fields?.agentId || initialAgentId || ""
   );
-
+  
   useEffect(() => {
     const agentIdFromState = state?.fields?.agentId as string | undefined;
+    // If state.fields.agentId is populated (e.g. due to a validation error), sync it.
     if (agentIdFromState !== undefined && agentIdFromState !== selectedAgentId) {
       setSelectedAgentId(agentIdFromState);
     } else if (initialAgentId && initialAgentId !== selectedAgentId && agentIdFromState === undefined) {
-      // If state is cleared (e.g. successful submission) but initialAgentId exists, re-select it.
-      // If form resets, initial state might repopulate, or we clear selectedAgentId.
+      // This condition helps if form resets (e.g. successful submission) and we want to re-apply initialAgentId.
+      // If state.report exists (success), or if state.fields.agentId is reset (e.g. by formAction initial state on success),
+      // and initialAgentId was provided, set selectedAgentId back to initialAgentId or empty string.
       setSelectedAgentId(state?.report ? (initialAgentId || "") : (agentIdFromState || ""));
     }
   }, [state?.fields?.agentId, initialAgentId, selectedAgentId, state?.report]);
@@ -62,6 +66,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
       });
       if(state.report) {
         formRef.current?.reset();
+        // Reset selectedAgentId to initialAgentId (if provided) or "" after successful submission
         setSelectedAgentId(initialAgentId || ""); 
       }
     }
@@ -92,7 +97,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
           <div>
             <Label htmlFor="agentIdSelect" className="text-muted-foreground">Agent ID (DID) (Optional)</Label>
             <Select
-              value={selectedAgentId} // Controlled component
+              value={selectedAgentId} 
               onValueChange={setSelectedAgentId}
               // name="agentId" // Name is on hidden input
             >
@@ -107,7 +112,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
               </SelectContent>
             </Select>
             {/* Hidden input to carry the value to FormData */}
-            <input type="hidden" name="agentId" value={selectedAgentId} />
+            <input type="hidden" name="agentId" value={selectedAgentId === "--NONE--" ? "" : selectedAgentId} />
             {state?.issues?.find(issue => issue.toLowerCase().includes("agent id")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.toLowerCase().includes("agent id"))}</p>}
           </div>
           <div>
@@ -145,9 +150,41 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
             <FileCheck2 className="h-5 w-5 text-accent" />
             <AlertTitle className="text-accent">Generated Attestation Report</AlertTitle>
             <AlertDescription>
-              <pre className="whitespace-pre-wrap text-sm text-accent-foreground/80 bg-background/30 p-3 rounded-md mt-2 overflow-x-auto">
-                {state.report}
-              </pre>
+              <div className="mt-2 p-3 rounded-md bg-background/30 text-accent-foreground/90 overflow-x-auto text-sm">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-4 mb-3 pb-1 border-b border-border" {...props} />,
+                    h2: ({node, ...props}) => <h2 className="text-xl font-semibold mt-3 mb-2 pb-1 border-b border-border/70" {...props} />,
+                    h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-2 mb-1" {...props} />,
+                    h4: ({node, ...props}) => <h4 className="text-base font-semibold mt-1 mb-1" {...props} />,
+                    p: ({node, ...props}) => <p className="mb-3 leading-relaxed" {...props} />,
+                    ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3 pl-5 space-y-1" {...props} />,
+                    ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3 pl-5 space-y-1" {...props} />,
+                    li: ({node, ...props}) => <li className="mb-0.5" {...props} />,
+                    code: ({node, inline, className, children, ...props}) => {
+                      const match = /language-(\w+)/.exec(className || '');
+                      return !inline ? (
+                        <pre className="block whitespace-pre-wrap bg-muted/50 p-3 rounded-md my-3 overflow-x-auto">
+                          <code className={`language-${match ? match[1] : 'text'}`} {...props}>{children}</code>
+                        </pre>
+                      ) : (
+                        <code className="px-1.5 py-0.5 bg-muted/50 rounded text-sm font-mono" {...props}>{children}</code>
+                      );
+                    },
+                    pre: ({node, children, ...props}) => <>{children}</>, // react-markdown wraps code blocks in pre, so we pass children through
+                    a: ({node, ...props}) => <a className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                    blockquote: ({node, ...props}) => <blockquote className="pl-4 border-l-4 border-border italic my-3 text-muted-foreground bg-card/50 py-2" {...props} />,
+                    table: ({node, ...props}) => <table className="min-w-full divide-y divide-border my-3 border border-border rounded-md shadow-sm" {...props} />,
+                    thead: ({node, ...props}) => <thead className="bg-card-foreground/10" {...props} />,
+                    th: ({node, ...props}) => <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider" {...props} />,
+                    td: ({node, ...props}) => <td className="px-4 py-2.5 text-sm border-t border-border" {...props} />,
+                    hr: ({node, ...props}) => <hr className="my-4 border-border/50" {...props} />
+                  }}
+                >
+                  {state.report}
+                </ReactMarkdown>
+              </div>
             </AlertDescription>
           </Alert>
         </div>
