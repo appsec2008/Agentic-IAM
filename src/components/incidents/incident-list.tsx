@@ -1,10 +1,11 @@
+
 "use client";
 
 import type { Incident } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, CheckCircle, ShieldExclamation, Wrench, Fingerprint } from "lucide-react";
+import { AlertTriangle, CheckCircle, ShieldAlert, Wrench, Fingerprint } from "lucide-react";
 import Link from "next/link";
 
 interface IncidentListProps {
@@ -82,7 +83,7 @@ export function IncidentList({ incidents, onQuarantineAgent }: IncidentListProps
                 onClick={() => onQuarantineAgent(incident.agentId)}
                 className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
               >
-                <ShieldExclamation className="mr-2 h-4 w-4" /> Quarantine Agent
+                <ShieldAlert className="mr-2 h-4 w-4" /> Quarantine Agent
               </Button>
             )}
           </CardFooter>
