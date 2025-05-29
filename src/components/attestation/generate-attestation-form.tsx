@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useFormStatus, useActionState } from "react-dom";
+import { useFormStatus } from "react-dom";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { generateAttestationAction, type GenerateAttestationActionState } from "@/app/actions/generate-attestation-action";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileCheck2, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MOCK_AGENTS } from "@/lib/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -94,7 +94,7 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
             <Select
               value={selectedAgentId}
               onValueChange={setSelectedAgentId}
-              name="agentId" // Ensure name attribute is here for form submission if not using hidden input
+              name="agentId" // Ensure name attribute is here for form submission
             >
               <SelectTrigger id="agentIdSelect" className="bg-card-foreground/5 text-foreground placeholder:text-muted-foreground">
                 <SelectValue placeholder="Select an agent DID (Optional)" />
@@ -106,8 +106,6 @@ export function GenerateAttestationForm({ initialAgentId }: GenerateAttestationF
                 ))}
               </SelectContent>
             </Select>
-            {/* Hidden input is still useful if Select doesn't reliably pass name via FormData on its own */}
-            {/* <input type="hidden" name="agentId" value={selectedAgentId} /> */}
             {state?.issues?.find(issue => issue.toLowerCase().includes("agent id")) && <p className="text-sm text-red-400 mt-1">{state.issues.find(issue => issue.toLowerCase().includes("agent id"))}</p>}
           </div>
           <div>
